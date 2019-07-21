@@ -6,7 +6,6 @@ from .serializer import SendOtpDao, ConfirmOtpDao, CustomerDto, UpdateCustomerDa
 import requests
 import random
 import datetime
-import string
 from .middleware import CustomerPermission
 from django.db.models import Q
 
@@ -126,7 +125,6 @@ class VerifyReferralCodeView(APIView):
         attributes = VerifyReferralCodeDao(data=request.data)
         if not attributes.is_valid():
             return Response(attributes.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
         response = {
             'is_valid': Customer.objects.filter(ref_code=attributes.data['ref_code']).exists()

@@ -1,7 +1,8 @@
 from django.db import models
 import os
 import hashlib
-import string, random
+import string
+import random
 
 # Create your models here.
 

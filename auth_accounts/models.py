@@ -16,16 +16,21 @@ class Customer(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     otp = models.IntegerField(default=0)
+    last_login_on = models.DateTimeField(default=None, null=True)
     otp_send_on = models.DateTimeField(default=None, null=True)
-    ref_code = models.CharField(max_length=255, blank=True)
+    ref_code = models.CharField(max_length=255, blank=True, unique=True)
     ref_bonus = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.ref_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        super(Customer, self).save(*args, **kwargs)
 
 
 class Referral(models.Model):
-    referrer = models.ForeignKey(Customer)
-    referee = models.ForeignKey(Customer)
-    status = models.BooleanField(default=False)
-    timestamp = models.DateTimeField(auto_now=True)
+    referrer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='referrer')
+    referee = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='referee')
+    create_on = models.DateTimeField(auto_now=True)
 
 
 class CustomerSession(models.Model):

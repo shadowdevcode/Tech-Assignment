@@ -1,14 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .models import CustomerSession, Customer
-from .serializer import SendOtpDao, ConfirmOtpDao, CustomerDto, UpdateCustomerDao
+from .models import CustomerSession, Customer, Referral
+from .serializer import SendOtpDao, ConfirmOtpDao, CustomerDto, UpdateCustomerDao, VerifyReferralCodeDao
 import requests
 import random
 import datetime
 import string
 from .middleware import CustomerPermission
-
+from django.db.models import Q
 
 # Create your views here.
 
@@ -34,12 +34,12 @@ class SendOtpView(APIView):
             phone_number=attributes.validated_data["phone_number"],
             country_code=attributes.validated_data["country_code"],
         ).first()
+
         if not customer:
             customer = Customer.objects.create(**attributes.validated_data)
 
         otp = send_otp(customer.phone_number)
         customer.otp = otp
-        customer.ref_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         customer.otp_send_on = datetime.datetime.utcnow()
         customer.save()
 
@@ -56,6 +56,7 @@ class ConfirmOtpView(APIView):
             phone_number=attributes.validated_data["phone_number"],
             country_code=attributes.validated_data["country_code"],
         ).first()
+
         if not customer:
             return Response({"message": "invalid customer"})
 
@@ -67,6 +68,29 @@ class ConfirmOtpView(APIView):
         ):
             return Response({"message": "otp expired"})
 
+        if attributes.validated_data['ref_code']:
+            if customer.last_login_on:
+                return Response({'message': 'Sorry you are already signed up'})
+
+            if Referral.objects.filter(referrer_id=customer.id).first():
+                return Response({'message': 'You have already applied the referral code'})
+
+            referred_by = Customer.objects.filter(~Q(phone_number=attributes.validated_data['phone_number']), 
+                                                  ref_code=attributes.validated_data['ref_code']).first()
+
+            if not referred_by:
+                return Response({'message': 'invalid referral code'})
+
+            referred_by.ref_bonus += 50
+            customer.ref_bonus += 50
+            referred_by.save()
+            customer.save()
+
+            Referral.objects.create(referrer_id=customer.id, referee_id=referred_by.id)
+
+        customer.last_login_on = datetime.datetime.utcnow()
+        customer.save()
+        
         session = CustomerSession.objects.create(customer_id=customer.id)
 
         data = {"customer": CustomerDto(customer).data, "token": session.token}
@@ -94,3 +118,18 @@ class CustomerLogoutView(APIView):
     def delete(self, request):
         CustomerSession.objects.filter(token=request.token).delete()
         return Response({"message": "session deleted successfully"})
+
+
+class VerifyReferralCodeView(APIView):
+
+    def post(self, request):
+        attributes = VerifyReferralCodeDao(data=request.data)
+        if not attributes.is_valid():
+            return Response(attributes.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+        response = {
+            'is_valid': Customer.objects.filter(ref_code=attributes.data['ref_code']).exists()
+        }
+
+        return Response(response)

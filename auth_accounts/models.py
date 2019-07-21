@@ -1,6 +1,7 @@
 from django.db import models
 import os
 import hashlib
+import string, random
 
 # Create your models here.
 
@@ -16,6 +17,15 @@ class Customer(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
     otp = models.IntegerField(default=0)
     otp_send_on = models.DateTimeField(default=None, null=True)
+    ref_code = models.CharField(max_length=255, blank=True)
+    ref_bonus = models.IntegerField(default=0)
+
+
+class Referral(models.Model):
+    referrer = models.ForeignKey(Customer)
+    referee = models.ForeignKey(Customer)
+    status = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now=True)
 
 
 class CustomerSession(models.Model):

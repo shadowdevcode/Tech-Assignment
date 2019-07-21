@@ -6,6 +6,7 @@ from .serializer import SendOtpDao, ConfirmOtpDao, CustomerDto, UpdateCustomerDa
 import requests
 import random
 import datetime
+import string
 from .middleware import CustomerPermission
 
 
@@ -24,7 +25,7 @@ def send_otp(phone):
 
 
 class SendOtpView(APIView):
-    def post(self, request):
+    def post(self, request, **kwargs):
         attributes = SendOtpDao(data=request.data)
         if not attributes.is_valid():
             return Response(attributes.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -38,6 +39,7 @@ class SendOtpView(APIView):
 
         otp = send_otp(customer.phone_number)
         customer.otp = otp
+        customer.ref_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         customer.otp_send_on = datetime.datetime.utcnow()
         customer.save()
 

@@ -35,5 +35,5 @@ class CustomerDto(serializers.ModelSerializer):
             "last_name",
             "birth_date",
             "you_are",
-            'ref_code',
+            "ref_code",
         )

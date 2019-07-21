@@ -24,13 +24,19 @@ class Customer(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.ref_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+            self.ref_code = "".join(
+                random.choices(string.ascii_uppercase + string.digits, k=5)
+            )
         super(Customer, self).save(*args, **kwargs)
 
 
 class Referral(models.Model):
-    referrer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='referrer')
-    referee = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='referee')
+    referrer = models.ForeignKey(
+        Customer, on_delete=models.CASCADE, related_name="referrer"
+    )
+    referee = models.ForeignKey(
+        Customer, on_delete=models.CASCADE, related_name="referee"
+    )
     create_on = models.DateTimeField(auto_now=True)
 
 
@@ -39,7 +45,7 @@ class CustomerSession(models.Model):
     token = models.CharField(max_length=64, default=None)
     created_on = models.DateTimeField(auto_now_add=True)
 
-    def save(self,  *args, ** kwargs):
+    def save(self, *args, **kwargs):
         token = str(hashlib.sha1(os.urandom(128)).hexdigest())
         self.token = token
         super(CustomerSession, self).save(*args, **kwargs)

@@ -1,5 +1,11 @@
 from django.urls import path
-from .views import SendOtpView, ConfirmOtpView, CustomerView, CustomerLogoutView, VerifyReferralCodeView
+from .views import (
+    SendOtpView,
+    ConfirmOtpView,
+    CustomerView,
+    CustomerLogoutView,
+    VerifyReferralCodeView,
+)
 
 app_name = "auth_accounts"
 urlpatterns = [

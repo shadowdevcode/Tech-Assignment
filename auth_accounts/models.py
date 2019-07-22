@@ -29,6 +29,14 @@ class Customer(models.Model):
             )
         super(Customer, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return (
+            self.first_name
+            + " "
+            + self.last_name
+            + " used referral code = {} ".format(self.ref_code)
+        )
+
 
 class Referral(models.Model):
     referrer = models.ForeignKey(
@@ -38,6 +46,9 @@ class Referral(models.Model):
         Customer, on_delete=models.CASCADE, related_name="referee"
     )
     create_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.referee, self.referrer
 
 
 class CustomerSession(models.Model):
@@ -49,3 +60,6 @@ class CustomerSession(models.Model):
         token = str(hashlib.sha1(os.urandom(128)).hexdigest())
         self.token = token
         super(CustomerSession, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.token + " " + "created on = {}".format(self.created_on)

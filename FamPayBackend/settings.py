@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 from datetime import timedelta
+from django.conf import settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,7 @@ SECRET_KEY = "&n2l(feg^xkf@((+31)$4xwsy=y--@pn@80()-z#+64sbr1jgx"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+settings.configure(DEBUG=True)
 ALLOWED_HOSTS = []
 
 

@@ -30,7 +30,8 @@ def send_otp(phone):
 
 
 class SendOtpView(APIView):
-    def post(self, request, **kwargs):
+    @staticmethod
+    def post(request, **kwargs):
         attributes = SendOtpDao(data=request.data)
         if not attributes.is_valid():
             return Response(attributes.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -52,7 +53,8 @@ class SendOtpView(APIView):
 
 
 class ConfirmOtpView(APIView):
-    def post(self, request):
+    @staticmethod
+    def post(request):
         attributes = ConfirmOtpDao(data=request.data)
         if not attributes.is_valid():
             return Response(attributes.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -109,7 +111,8 @@ class ConfirmOtpView(APIView):
 class CustomerView(APIView):
     permission_classes = (CustomerPermission,)
 
-    def put(self, request):
+    @staticmethod
+    def put(request):
         attributes = UpdateCustomerDao(data=request.data)
         if not attributes.is_valid():
             return Response(attributes.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -124,13 +127,15 @@ class CustomerView(APIView):
 class CustomerLogoutView(APIView):
     permission_classes = (CustomerPermission,)
 
-    def delete(self, request):
+    @staticmethod
+    def delete(request):
         CustomerSession.objects.filter(token=request.token).delete()
         return Response({"message": "session deleted successfully"})
 
 
 class VerifyReferralCodeView(APIView):
-    def post(self, request):
+    @staticmethod
+    def post(request):
         attributes = VerifyReferralCodeDao(data=request.data)
         if not attributes.is_valid():
             return Response(attributes.errors, status=status.HTTP_400_BAD_REQUEST)

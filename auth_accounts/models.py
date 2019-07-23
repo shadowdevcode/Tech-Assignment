@@ -8,6 +8,7 @@ import random
 
 
 class Customer(models.Model):
+    """Implementing Customer Model"""
     phone_number = models.CharField(max_length=255)
     country_code = models.IntegerField(default=0)
     first_name = models.CharField(max_length=50, blank=True, null=True)

@@ -1,5 +1,5 @@
 # Tech-Assignment
-Assignment on React-native and Django
+Assignment on Django. Focus - Models and architecture 
 
 ## What does it contain?
 - Models

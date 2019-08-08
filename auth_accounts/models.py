@@ -9,6 +9,7 @@ import random
 
 class Customer(models.Model):
     """Implementing Customer Model"""
+
     phone_number = models.CharField(max_length=255)
     country_code = models.IntegerField(default=0)
     first_name = models.CharField(max_length=50, blank=True, null=True)
@@ -20,6 +21,8 @@ class Customer(models.Model):
     otp = models.IntegerField(default=0)
     last_login_on = models.DateTimeField(default=None, null=True)
     otp_send_on = models.DateTimeField(default=None, null=True)
+    # Reference Code Logic Implementation
+    # TODO : Declare reference code | ref_code & reference bonus | ref_bonus
     ref_code = models.CharField(max_length=255, blank=True, unique=True)
     ref_bonus = models.IntegerField(default=0)
 
